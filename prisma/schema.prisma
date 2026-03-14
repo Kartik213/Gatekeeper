@@ -83,6 +83,7 @@ model Organization {
 
   members     Member[]
   invitations Invitation[]
+  projects Project[]
 }
 
 model Member {
@@ -104,5 +105,17 @@ model Invitation {
   status         String
   expiresAt      DateTime
   inviterId      String
+  createdAt      DateTime     @default(now())
+}
+
+// ============================================================
+// App-specific tables
+// ============================================================
+
+model Project {
+  id             String       @id @default(cuid())
+  organizationId String
+  organization   Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  name           String
   createdAt      DateTime     @default(now())
 }
