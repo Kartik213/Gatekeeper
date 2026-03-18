@@ -15,7 +15,7 @@ export function Providers({ children }: { children: React.ReactNode }) {
           url: "/api/trpc",
         }),
       ],
-    })
+    }),
   );
 
   return (
