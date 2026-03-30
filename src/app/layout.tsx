@@ -17,8 +17,9 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "FeatureFlagHub",
-  description: "Lightweight feature flag management for developers",
+  title: "Gatekeeper",
+  description: "Feature Flag Management",
+  icons: [{ rel: "icon", url: "/favicon.ico" }],
 };
 
 export default function RootLayout({

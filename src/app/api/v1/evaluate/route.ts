@@ -11,10 +11,7 @@ export async function GET(req: NextRequest) {
   // 1. Authenticate via API key
   const apiKey = req.headers.get("x-api-key");
   if (!apiKey) {
-    return NextResponse.json(
-      { error: "Missing x-api-key header" },
-      { status: 401 }
-    );
+    return NextResponse.json({ error: "Missing x-api-key header" }, { status: 401 });
   }
 
   const keyHash = hashApiKey(apiKey);
@@ -33,10 +30,7 @@ export async function GET(req: NextRequest) {
   const attributesRaw = req.nextUrl.searchParams.get("attributes");
 
   if (!flag) {
-    return NextResponse.json(
-      { error: "Missing 'flag' query parameter" },
-      { status: 400 }
-    );
+    return NextResponse.json({ error: "Missing 'flag' query parameter" }, { status: 400 });
   }
 
   let attributes: Record<string, string> | undefined;
@@ -44,20 +38,12 @@ export async function GET(req: NextRequest) {
     try {
       attributes = JSON.parse(attributesRaw);
     } catch {
-      return NextResponse.json(
-        { error: "Invalid 'attributes' JSON" },
-        { status: 400 }
-      );
+      return NextResponse.json({ error: "Invalid 'attributes' JSON" }, { status: 400 });
     }
   }
 
   // 3. Evaluate flag
-  const enabled = await evaluateFlag(
-    keyRecord.projectId,
-    flag,
-    userId,
-    attributes
-  );
+  const enabled = await evaluateFlag(keyRecord.projectId, flag, userId, attributes);
 
   return NextResponse.json({ enabled });
 }

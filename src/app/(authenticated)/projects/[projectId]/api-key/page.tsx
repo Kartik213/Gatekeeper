@@ -12,8 +12,6 @@ import {
   Table,
   TableBody,
   TableCell,
-  TableHead,
-  TableHeader,
   TableRow,
 } from "@/components/ui/table";
 import { Check, Copy, RefreshCw, Trash2 } from "lucide-react";
@@ -21,12 +19,18 @@ import { DeleteApiKeyModal } from "@/components/modals/DeleteApiKeyModal";
 import { CreateApiKeyForm } from "@/components/forms/CreateApiKeyForm";
 import { useRouter } from "next/navigation";
 
-const SDK_INSTALL_COMMAND = "npm install featureflaghub-sdk";
+const INSTALL_COMMANDS = {
+  npm: "npm install @gatekeeper-dev/sdk",
+  yarn: "yarn add @gatekeeper-dev/sdk",
+  pnpm: "pnpm add @gatekeeper-dev/sdk",
+  bun: "bun add @gatekeeper-dev/sdk",
+} as const;
+
+type PkgManager = keyof typeof INSTALL_COMMANDS;
 
 export default function SettingsPage() {
   const { projectId } = useParams<{ projectId: string }>();
   const router = useRouter();
-  const utils = trpc.useUtils();
   const { data: apiKeys, isPending } = trpc.apiKeys.list.useQuery({ projectId });
   const apiKey = apiKeys?.[0];
 
@@ -35,6 +39,7 @@ export default function SettingsPage() {
   const [copied, setCopied] = useState(false);
   const [copiedBaseUrl, setCopiedBaseUrl] = useState(false);
   const [copiedCommand, setCopiedCommand] = useState(false);
+  const [selectedPkg, setSelectedPkg] = useState<PkgManager>("npm");
 
   const copyKey = () => {
     if (newKey) {
@@ -53,7 +58,7 @@ export default function SettingsPage() {
   };
 
   const copyCommand = () => {
-    navigator.clipboard.writeText(SDK_INSTALL_COMMAND);
+    navigator.clipboard.writeText(INSTALL_COMMANDS[selectedPkg]);
     setCopiedCommand(true);
     setTimeout(() => setCopiedCommand(false), 2000);
   };
@@ -246,19 +251,43 @@ export default function SettingsPage() {
           </CardDescription>
         </CardHeader>
         <CardContent>
-          <div className="space-y-4">
+          <div className="space-y-6">
             <div>
-              <div className="text-muted-foreground mb-2 text-[11px] font-semibold tracking-wider uppercase">
-                Install
+              <div className="mb-3 flex items-center justify-between">
+                <div className="text-muted-foreground text-[11px] font-semibold tracking-wider uppercase">
+                  Install
+                </div>
+                <div className="bg-muted/50 flex items-center gap-1 rounded-lg p-0.5">
+                  {(Object.keys(INSTALL_COMMANDS) as PkgManager[]).map((pkg) => (
+                    <button
+                      key={pkg}
+                      onClick={() => setSelectedPkg(pkg)}
+                      className={`rounded-md px-2 py-1 text-[11px] font-medium transition-all ${
+                        selectedPkg === pkg
+                          ? "bg-background text-foreground shadow-sm"
+                          : "text-muted-foreground hover:text-foreground"
+                      }`}
+                    >
+                      {pkg}
+                    </button>
+                  ))}
+                </div>
               </div>
-              <div className="flex items-center w-fit gap-5 bg-card ring-foreground/5 rounded-lg border ring-1 pl-3">
-                <pre className="overflow-x-auto font-mono text-xs">{SDK_INSTALL_COMMAND}</pre>
+              <div className="bg-card ring-foreground/5 flex w-full items-center justify-between gap-5 rounded-lg border pl-4 pr-1 ring-1">
+                <pre className="overflow-x-auto py-3 font-mono text-xs">
+                  {INSTALL_COMMANDS[selectedPkg]}
+                </pre>
                 <Button
-                  variant="outline"
+                  variant="ghost"
+                  size="icon"
                   onClick={copyCommand}
-                  className="shrink-0 text-[13px]"
+                  className="h-8 w-8 shrink-0"
                 >
-                  {copiedCommand ? <Check className="size-4 text-emerald-600" /> : <Copy className="size-4" />}
+                  {copiedCommand ? (
+                    <Check className="size-4 text-emerald-600" />
+                  ) : (
+                    <Copy className="size-4" />
+                  )}
                 </Button>
               </div>
             </div>
@@ -268,7 +297,7 @@ export default function SettingsPage() {
                 Usage
               </div>
               <pre className="bg-card ring-foreground/5 overflow-x-auto rounded-lg border p-3 font-mono text-xs ring-1">
-                {`import { createClient } from "featureflaghub-sdk"
+                {`import { createClient } from "@gatekeeper/sdk"
 
 const client = createClient({
   apiKey: "ffh_your_api_key",

@@ -1,5 +1,5 @@
 {
-  "name": "feature-flag-hub",
+  "name": "gatekeeper",
   "version": "0.1.0",
   "private": true,
   "type": "module",

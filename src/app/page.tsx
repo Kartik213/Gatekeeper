@@ -6,7 +6,8 @@ import { logout } from "@/lib/auth-utils";
 import { Button } from "@/components/ui/button";
 import { ThemeToggle } from "@/components/theme-toggle";
 import { Badge } from "@/components/ui/badge";
-import { ArrowRight, CheckCircle2, Code2, Flag, Layers3, ShieldCheck, LogOut } from "lucide-react";
+import { ArrowRight, CheckCircle2, Code2, Layers3, ShieldCheck, LogOut } from "lucide-react";
+import { GatekeeperLogo } from "@/components/GateKeeperLogo";
 
 const steps = [
   {
@@ -38,11 +39,9 @@ export default function LandingPage() {
       <header className="border-border/70 border-b">
         <div className="mx-auto flex w-full max-w-6xl items-center justify-between px-4 py-5 md:px-8">
           <Link href="/" className="flex items-center gap-3">
-            <div className="bg-primary text-primary-foreground flex size-10 items-center justify-center rounded-2xl">
-              <Flag className="size-4" />
-            </div>
+            <GatekeeperLogo />
             <div>
-              <div className="text-sm font-semibold">FeatureFlagHub</div>
+              <div className="text-sm font-semibold">Gatekeeper</div>
               <div className="text-muted-foreground text-xs">
                 Lightweight release control for product teams
               </div>
@@ -92,8 +91,8 @@ export default function LandingPage() {
                   Explain the product fast. Show the value in one flow.
                 </h1>
                 <p className="text-muted-foreground max-w-2xl text-base leading-7 md:text-lg">
-                  FeatureFlagHub helps teams create organizations, add projects, define rollout
-                  rules, and evaluate flags from real applications.
+                  Gatekeeper helps teams create organizations, add projects, define rollout rules,
+                  and evaluate flags from real applications.
                 </p>
               </div>
               <div className="flex flex-wrap gap-3">
@@ -198,7 +197,7 @@ export default function LandingPage() {
 
       <footer className="border-border/70 border-t">
         <div className="text-muted-foreground mx-auto flex w-full max-w-6xl flex-col gap-4 px-4 py-8 text-sm md:flex-row md:items-center md:justify-between md:px-8">
-          <div>FeatureFlagHub helps product teams release with less risk.</div>
+          <div>Gatekeeper helps product teams release with less risk.</div>
           <div className="flex items-center gap-4">
             <Link href={session ? "/org" : "/signup"} className="hover:text-foreground">
               {isPending ? "Loading..." : session ? "Dashboard" : "Get started"}

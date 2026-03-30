@@ -5,6 +5,7 @@ import { usePathname } from "next/navigation";
 import { Home, Settings } from "lucide-react";
 import { OrganizationSelector } from "@/components/OrgSelector";
 import { ThemeToggle } from "@/components/theme-toggle";
+import { GatekeeperLogo } from "@/components/GateKeeperLogo";
 
 export const navItems = [
   { href: "/org", label: "Projects", icon: Home },
@@ -22,21 +23,11 @@ export function Sidebar() {
             href="/"
             className="group/brand border-sidebar-border/50 mb-2 flex items-center gap-2.5 border-b px-2 pb-4"
           >
-            <div className="bg-primary shadow-primary/20 flex h-7 w-7 items-center justify-center rounded-lg shadow-lg transition-transform group-hover/brand:scale-110">
-              <svg
-                width="14"
-                height="14"
-                viewBox="0 0 24 24"
-                fill="none"
-                stroke="currentColor"
-                strokeWidth="3.5"
-                className="text-primary-foreground"
-              >
-                <polyline points="20,6 9,17 4,12" />
-              </svg>
+            <div className="flex transition-transform group-hover/brand:scale-110">
+              <GatekeeperLogo />
             </div>
             <span className="text-foreground/80 text-xs font-semibold tracking-tight tracking-wider uppercase">
-              Feature Flag Hub
+              Gatekeeper
             </span>
           </Link>
         </div>

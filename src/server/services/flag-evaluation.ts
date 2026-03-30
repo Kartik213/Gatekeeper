@@ -12,7 +12,7 @@ function evaluateRule(
     operator: string;
     value: string;
   },
-  attributes: Record<string, string>
+  attributes: Record<string, string>,
 ): boolean {
   const attrValue = attributes[rule.attribute];
   if (attrValue === undefined) return false;
@@ -29,7 +29,10 @@ function evaluateRule(
     case "ends_with":
       return attrValue.endsWith(rule.value);
     case "in":
-      return rule.value.split(",").map((v) => v.trim()).includes(attrValue);
+      return rule.value
+        .split(",")
+        .map((v) => v.trim())
+        .includes(attrValue);
     default:
       return false;
   }
@@ -39,7 +42,7 @@ export async function evaluateFlag(
   projectId: string,
   flagName: string,
   userId?: string,
-  attributes?: Record<string, string>
+  attributes?: Record<string, string>,
 ): Promise<boolean> {
   // 1. Fetch directly from DB
   const flag = await db.featureFlag.findUnique({
@@ -66,9 +69,7 @@ export async function evaluateFlag(
   if (flagData.rules.length > 0) {
     if (!attributes) return false;
 
-    const ruleMatch = flagData.rules.some((rule) =>
-      evaluateRule(rule, attributes)
-    );
+    const ruleMatch = flagData.rules.some((rule) => evaluateRule(rule, attributes));
 
     if (!ruleMatch) return false;
   }
