@@ -1,5 +1,6 @@
 import { z } from "zod";
 import { router, protectedProcedure } from "../trpc";
+import { invalidateFlagCache } from "@/server/services/redis";
 import {
   requireFlagAccess,
   requireProjectAccess,
@@ -24,6 +25,8 @@ export const flagsRouter = router({
       const flag = await ctx.db.featureFlag.create({
         data: input,
       });
+
+      await invalidateFlagCache(flag.projectId, flag.name);
 
       return flag;
     }),
@@ -79,6 +82,8 @@ export const flagsRouter = router({
         data,
       });
 
+      await invalidateFlagCache(flag.projectId, flag.name);
+
       return flag;
     }),
 
@@ -89,6 +94,8 @@ export const flagsRouter = router({
       const flag = await requireFlagAccess(ctx.db, input.id, userId);
 
       await ctx.db.featureFlag.delete({ where: { id: flag.id } });
+      
+      await invalidateFlagCache(flag.projectId, flag.name);
 
       return { success: true };
     }),
@@ -108,6 +115,8 @@ export const flagsRouter = router({
 
       const rule = await ctx.db.flagRule.create({ data: input });
 
+      await invalidateFlagCache(flag.projectId, flag.name);
+
       return rule;
     }),
 
@@ -118,7 +127,9 @@ export const flagsRouter = router({
       const rule = await requireRuleAccess(ctx.db, input.ruleId, userId);
 
       await ctx.db.flagRule.delete({ where: { id: rule.id } });
-
+      
+      await invalidateFlagCache(rule.flag.projectId, rule.flag.name);
+      
       return { success: true };
     }),
 });

@@ -1,5 +1,6 @@
 import { createHash } from "crypto";
 import { db } from "@/lib/prisma";
+import { getCachedFlag, setCachedFlag, type CachedFlag } from "./redis";
 
 function hashUserId(userId: string): number {
   const hash = createHash("md5").update(userId).digest("hex");
@@ -7,11 +8,7 @@ function hashUserId(userId: string): number {
 }
 
 function evaluateRule(
-  rule: {
-    attribute: string;
-    operator: string;
-    value: string;
-  },
+  rule: CachedFlag["rules"][number],
   attributes: Record<string, string>,
 ): boolean {
   const attrValue = attributes[rule.attribute];
@@ -44,28 +41,36 @@ export async function evaluateFlag(
   userId?: string,
   attributes?: Record<string, string>,
 ): Promise<boolean> {
-  // 1. Fetch directly from DB
-  const flag = await db.featureFlag.findUnique({
-    where: { projectId_name: { projectId, name: flagName } },
-    include: { rules: true },
-  });
+  // 1. Try cache first
+  let flagData = await getCachedFlag(projectId, flagName);
 
-  if (!flag) return false;
+  // 2. Fallback to DB
+  if (!flagData) {
+    const flag = await db.featureFlag.findUnique({
+      where: { projectId_name: { projectId, name: flagName } },
+      include: { rules: true },
+    });
 
-  const flagData = {
-    enabled: flag.enabled,
-    rolloutPercentage: flag.rolloutPercentage,
-    rules: flag.rules.map((r) => ({
-      attribute: r.attribute,
-      operator: r.operator,
-      value: r.value,
-    })),
-  };
+    if (!flag) return false;
 
-  // 2. Check if flag is enabled
+    flagData = {
+      enabled: flag.enabled,
+      rolloutPercentage: flag.rolloutPercentage,
+      rules: flag.rules.map((r) => ({
+        attribute: r.attribute,
+        operator: r.operator,
+        value: r.value,
+      })),
+    };
+
+    // Cache for next time
+    await setCachedFlag(projectId, flagName, flagData);
+  }
+
+  // 3. Check if flag is enabled at all
   if (!flagData.enabled) return false;
 
-  // 3. Evaluate rules (if any)
+  // 4. If rules exist, evaluation context must match at least one rule.
   if (flagData.rules.length > 0) {
     if (!attributes) return false;
 
@@ -74,12 +79,12 @@ export async function evaluateFlag(
     if (!ruleMatch) return false;
   }
 
-  // 4. Evaluate rollout percentage
+  // 5. Evaluate rollout percentage
   if (userId && flagData.rolloutPercentage < 100) {
     const bucket = hashUserId(userId);
     return bucket < flagData.rolloutPercentage;
   }
 
-  // 5. If rollout is 100%
+  // 6. If rollout is 100% and flag is enabled, return true
   return flagData.rolloutPercentage === 100;
 }
