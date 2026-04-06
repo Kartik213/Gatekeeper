@@ -245,4 +245,4 @@ cd sdk && npm run dev
 
 The SDK has its own focused README here:
 
-- [`sdk/README.md`](/home/kartik-chainscore/Kartik/feature-flag-hub/sdk/README.md)
+- [`sdk/README.md`](https://github.com/Kartik213/Gatekeeper/tree/main/sdk#gatekeeper-devsdk)
