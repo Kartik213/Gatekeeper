@@ -1,6 +1,14 @@
 {
   "name": "@gatekeeper-dev/sdk",
-  "version": "0.1.0",
+  "version": "0.1.2",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/Kartik213/Gatekeeper.git"
+  },
+  "homepage": "https://github.com/Kartik213/Gatekeeper#readme",
+  "bugs": {
+    "url": "https://github.com/Kartik213/Gatekeeper/issues"
+  },
   "description": "Client SDK for Gatekeeper - lightweight feature flag management",
   "main": "dist/index.cjs",
   "module": "dist/index.js",
@@ -12,7 +20,9 @@
       "require": "./dist/index.cjs"
     }
   },
-  "files": ["dist"],
+  "files": [
+    "dist"
+  ],
   "scripts": {
     "build": "tsup src/index.ts --format cjs,esm --dts --clean",
     "dev": "tsup src/index.ts --format cjs,esm --dts --watch"
@@ -21,6 +31,10 @@
     "tsup": "^8.0.0",
     "typescript": "^5.0.0"
   },
-  "keywords": ["feature-flags", "feature-toggle", "sdk"],
+  "keywords": [
+    "feature-flags",
+    "feature-toggle",
+    "sdk"
+  ],
   "license": "MIT"
 }
